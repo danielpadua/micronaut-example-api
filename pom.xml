@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>dev.danielpadua</groupId>
+  <artifactId>micronaut-example-api</artifactId>
+  <version>0.1</version>
+  <packaging>${packaging}</packaging>
+
+  <parent>
+    <groupId>io.micronaut</groupId>
+    <artifactId>micronaut-parent</artifactId>
+    <version>2.5.4</version>
+  </parent>
+
+  <properties>
+    <packaging>jar</packaging>
+    <jdk.version>11</jdk.version>
+    <release.version>11</release.version>
+    <micronaut.version>2.5.4</micronaut.version>
+    <logstash_logback_encoder.version>6.6</logstash_logback_encoder.version>
+    <javafaker.version>1.0.2</javafaker.version>
+    <modelmapper.version>2.4.2</modelmapper.version>
+    <exec.mainClass>dev.danielpadua.micronautexampleapi.Application</exec.mainClass>
+    <micronaut.runtime>netty</micronaut.runtime>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>central</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.micronaut</groupId>
+      <artifactId>micronaut-inject</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.micronaut</groupId>
+      <artifactId>micronaut-validation</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.micronaut.test</groupId>
+      <artifactId>micronaut-test-junit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.micronaut</groupId>
+      <artifactId>micronaut-http-client</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.micronaut</groupId>
+      <artifactId>micronaut-http-server-netty</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.micronaut</groupId>
+      <artifactId>micronaut-runtime</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-annotations</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.micronaut</groupId>
+      <artifactId>micronaut-management</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.micronaut.micrometer</groupId>
+      <artifactId>micronaut-micrometer-registry-prometheus</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+      <version>${logstash_logback_encoder.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.javafaker</groupId>
+      <artifactId>javafaker</artifactId>
+      <version>${javafaker.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.modelmapper</groupId>
+      <artifactId>modelmapper</artifactId>
+      <version>${modelmapper.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.micronaut.build</groupId>
+        <artifactId>micronaut-maven-plugin</artifactId>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!-- Uncomment to enable incremental compilation -->
+          <!-- <useIncrementalCompilation>false</useIncrementalCompilation> -->
+          <fork>true</fork>
+          <annotationProcessorPaths combine.children="append">
+            <path>
+              <groupId>io.micronaut.openapi</groupId>
+              <artifactId>micronaut-openapi</artifactId>
+              <version>${micronaut.openapi.version}</version>
+            </path>
+          </annotationProcessorPaths>
+          <compilerArgs>
+            <arg>-Amicronaut.processing.group=dev.danielpadua.micronautexampleapi</arg>
+            <arg>-Amicronaut.processing.module=micronaut-example-api</arg>
+            <arg>-J-Dmicronaut.openapi.views.spec=swagger-ui.enabled=true</arg>
+            <arg>-J-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <delete>
+                  <fileset dir="${project.build.directory}">
+                    <include name="**/*original-*"/>
+                  </fileset>
+                </delete>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
